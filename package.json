@@ -7,12 +7,25 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "axios": "^0.20.0",
+    "better-scroll": "^2.0.5",
     "core-js": "^3.6.5",
-    "vue": "^2.6.11"
+    "element-ui": "^2.13.2",
+    "lyric-parser": "^1.0.1",
+    "swiper": "^5.4.5",
+    "vue": "^2.6.11",
+    "vue-awesome-swiper": "^2.6.7",
+    "vue-kinesis": "^1.1.5",
+    "vue-router": "^3.4.6",
+    "vuex": "^3.5.1",
+    "vuex-persistedstate": "^4.0.0-beta.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.4.0",
     "@vue/cli-service": "^4.4.0",
+    "babel-plugin-component": "^1.1.1",
+    "less": "^2.7.3",
+    "less-loader": "^7.0.2",
     "vue-template-compiler": "^2.6.11"
   }
 }
