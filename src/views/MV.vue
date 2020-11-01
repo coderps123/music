@@ -1,21 +1,26 @@
 <template>
   <div class="mv">
-    <category-container
-      :category="mvCategory"
-      :activeIndex="activeIndex"
-      @switchTag="switchTag"/>
-    <video-list :videoList="mvList"></video-list>
+    <div v-if="!isLoading">
+      <category-container
+        :category="mvCategory"
+        :activeIndex="activeIndex"
+        @switchTag="switchTag"/>
+      <video-list :videoList="mvList"></video-list>
+    </div>
+    <loading v-if="isLoading"></loading>
   </div>
 </template>
 
 <script>
   import CategoryContainer from "../components/common/CategoryContainer";
   import VideoList from "../components/common/VideoList";
+  import Loading from "../components/common/Loading"
   export default {
     name: "MV",
     components: {
       CategoryContainer,
-      VideoList
+      VideoList,
+      Loading
     },
     data() {
       return {
@@ -53,7 +58,8 @@
           area: 0,
           type: 0,
           order: 0
-        }
+        },
+        isLoading: true
       }
     },
     methods: {
@@ -70,7 +76,7 @@
           let res = await this.$api.getAllMV(this.mvParamas)
           if (res.status === 200 && res.statusText === "OK") {
             this.mvList = res.data.data
-            console.log(this.mvList)
+            this.isLoading = false
           }
         } catch (err) {
           console.log(err)

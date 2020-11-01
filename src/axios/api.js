@@ -64,7 +64,7 @@ export const getSingerCategory = params => instance.get(`/artist/list`, {params}
  * @methods 歌手单曲
  * @params id: 歌手id
  */
-export const getSingerSingle = id => instance.get(`/artists?id=${id}`)
+export const getSingerSingle = params => instance.get(`/artists`, {params})
 
 /**
  * @methods 歌手专辑
@@ -117,7 +117,7 @@ export const getMvComments = params => instance.get(`/comment/mv`, {params})
  * @methods mv 点赞转发评论数数据
  * @params 必选参数 : mvid: mv 的 id
  */
-export const getMvDetailInfo = id => instance.get(`/mv/detail/info?mvid=${id}`, {})
+export const getMvDetailInfo = params => instance.get(`/mv/detail/info`, {params})
 
 /**
  * @methods mv 相似 mv 调用此接口 , 传入 mvid 可获取相似 mv
@@ -172,3 +172,86 @@ export const getSearchHot = () => instance.get(`/search/hot`)
  * @params 1004: MV, 1006: 歌词, 1009: 电台, 1014: 视频, 1018:综合
  */
 export const getSearchData = params => instance.get(`/cloudsearch`, {params})
+
+/**
+ * @methods 获取全部视频列表
+ * @params 说明 : 调用此接口,可获取视频分类列表,分页参数只能传入offset
+ * @params 可选参数 : offset: 默认0
+ */
+export const getAllVideoList = params => instance.get(`/video/timeline/all`, {params})
+
+/**
+ * @methods 获取视频分类列表
+ * @params 说明 : 调用此接口 , 可获取视频分类列表
+ */
+export const getVideoCategoryList = params => instance.get(`/video/category/list`, {params})
+
+/**
+ * @methods 获取视频标签列表
+ * @params 说明 : 调用此接口 , 可获取视频标签列表
+ */
+export const getVideoTagList = params => instance.get(`/video/group/list`, {params})
+
+/**
+ * @methods 获取视频标签/分类下的视频
+ * @params 说明 : 调用此接口 , 传入标签/分类id,可获取到相关的视频,分页参数只能传入offset
+ * @params 必选参数 : id: videoGroup 的 id
+ * @params 可选参数 : offset: 默认0
+ */
+export const getVideoList = params => instance.get(`/video/group`, {params})
+
+/**
+ * @methods 获取登录状态
+ * @params 说明 : 调用此接口,可获取登录状态
+ */
+export const getLoginStatus = () => instance.get(`/login/status`, {})
+
+/**
+ * @methods 获取视频播放地址
+ * @params 说明 : 调用此接口 , 传入视频 id,可获取视频播放地址
+ * @params 必选参数 : id: 视频 的 id
+ */
+export const getVideoUrl = params => instance.get(`/video/url`, {params})
+
+/**
+ * @methods 视频详情
+ * @params 说明 : 调用此接口 , 可获取视频详情
+ * @params 必选参数 : id: 视频 的 id
+ */
+export const getVideoDetail = params => instance.get(`/video/detail`, {params})
+
+/**
+ * @methods 获取视频点赞转发评论数数据
+ * @params 说明 : 调用此接口 , 传入 vid ( 视频id ) , 可获取对应视频点赞转发评论数数据 必选参数 : vid: 视频id
+ * @params 必选参数 : id: 视频 的 id
+ */
+export const getVideoDetailInfo = params => instance.get(`/video/detail/info`, {params})
+
+/**
+ * @methods 视频评论
+ * @params 说明 : 调用此接口 , 传入音乐 id 和 limit 参数 , 可获得该 视频 的所有评论 ( 不需要登录 )
+ * @params 必选参数 : id: 视频的 id
+ * @params 可选参数 : limit: 取出评论数量 , 默认为 20
+ * @params 可选参数 : offset: 偏移数量 , 用于分页 , 如 :( 评论页数 -1)*20, 其中 20 为 limit 的值
+ * @params 可选参数 : before: 分页参数,取上一页最后一项的 time 获取下一页数据(获取超过5000条评论的时候需要用到)
+ */
+export const getVideoComment = params => instance.get(`/comment/video`, {params})
+
+/**
+ * @methods 相关视频
+ * @params 说明 : 调用此接口 , 可获取相关视频
+ * @params 必选参数 : id: 视频 的 id
+ */
+export const getRecommendVideo = params => instance.get(`/related/allvideo`, {params})
+
+/**
+ * @methods 楼层评论
+ * @params 说明 : 调用此接口 , 传入资源 parentCommentId 和资源类型 type和资源id 参数, 可获得该资源的歌曲楼层评论
+ * @params 必选参数 : parentCommentId: 楼层评论 id
+ * @params 必选参数 : id : 资源 id
+ * @params 必选参数 : tpye: 数字 , 资源类型 , 对应歌曲 , mv, 专辑 , 歌单 , 电台, 视频对应以下类型
+ * @params 0: 歌曲, 1: mv, 2: 歌单, 3: 专辑, 4: 电台, 5: 视频
+ * @params 可选参数 : limit: 取出评论数量 , 默认为 20
+ * @params 可选参数 : time: 分页参数,取上一页最后一项的 time 获取下一页数据
+ */
+// export const getFloorComment = params => instance.get(`/comment/floor`, {params})

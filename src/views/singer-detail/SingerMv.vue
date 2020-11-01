@@ -1,19 +1,23 @@
 <template>
   <div class="singer-mv">
-    <video-list :videoList="mvs"></video-list>
+    <video-list v-if="!isLoading" :videoList="mvs"></video-list>
+    <loading v-if="isLoading"></loading>
   </div>
 </template>
 
 <script>
   import VideoList from "../../components/common/VideoList";
+  import Loading from "../../components/common/Loading"
   export default {
     name: "SingerMv",
     components: {
-      VideoList
+      VideoList,
+      Loading
     },
     data() {
       return {
-        mvs: []
+        mvs: [],
+        isLoading: true
       }
     },
     methods: {
@@ -21,6 +25,7 @@
         let res = await this.$api.getSingerMv(this.$route.params.id)
         if (res.status === 200 && res.statusText === "OK") {
           this.mvs = res.data.mvs
+          this.isLoading = false
         }
       }
     },

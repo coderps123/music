@@ -1,18 +1,24 @@
 <template>
   <div class="singer">
-    <category-container :category="singerCategory" @switchTag="switchTag" :activeIndex="activeIndex"></category-container>
-    <singer-list :singers="singers"></singer-list>
+    <div v-if="!isLoading">
+      <category-container :category="singerCategory" @switchTag="switchTag" :activeIndex="activeIndex"></category-container>
+      <singer-list :singers="singers"></singer-list>
+    </div>
+    <loading v-if="isLoading"></loading>
   </div>
 </template>
 
 <script>
   import CategoryContainer from "../components/common/CategoryContainer";
   import SingerList from "../components/common/SingerList";
+  import Loading from "../components/common/Loading"
+
   export default {
     name: "Singer",
     components: {
       SingerList,
-      CategoryContainer
+      CategoryContainer,
+      Loading
     },
     data() {
       return {
@@ -21,7 +27,7 @@
           offset: 0,
           type: -1,
           area: -1,
-          initial: -1
+          initial: -1,
         },
         singers: [],
         singerCategory: {
@@ -73,7 +79,8 @@
           type: 0,
           area: 0,
           initial: 0
-        }
+        },
+        isLoading: true
       }
     },
     methods: {
@@ -90,6 +97,7 @@
           let res = await this.$api.getSingerCategory(this.singerParams)
           if (res.status === 200 && res.statusText === "OK") {
             this.singers = res.data.artists
+            this.isLoading = false
           }
         } catch (err) {
           console.log(err)

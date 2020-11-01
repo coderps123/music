@@ -1,77 +1,34 @@
 <template>
   <div class="mv-detail">
     <div class="left-container">
-      <div class="video-container">
-        <video :src="url" controls autoplay></video>
-      </div>
-      <div class="icon clearfix">
-        <i class="iconfont iconmv"></i>
-        <span class="play-count">{{mvDetail.playCount | handlePlayCount}}播放</span>
-      </div>
-      <div class="tags">
-        <a class="tag" href="javascript:;" v-for="item in mvDetail.videoGroup" :key="item.id">#{{item.name}}</a>
-      </div>
-      <div class="publish">
-        发布: {{mvDetail.publishTime}}
-      </div>
-      <div class="button">
-        <!--喜欢-->
-        <div class="icon-wrapper">
-          <i class="iconfont iconlike" :class="mvDetailInfo.liked ? 'icon-active' : ''"></i>
-          {{mvDetailInfo.likedCount}}
-        </div>
-        <!--收藏-->
-        <div class="icon-wrapper">
-          <i class="iconfont iconshoucangxuanzhong"></i>
-          {{mvDetail.subCount}}
-        </div>
-        <!--转发-->
-        <div class="icon-wrapper">
-          <i class="iconfont iconforward"></i>
-          {{mvDetailInfo.shareCount}}
-        </div>
-      </div>
-      <div class="comments">
-        <i class="iconfont iconxinxi"></i>
-        Comments | {{mvDetailInfo.commentCount}}条评论
-      </div>
+      <video-main
+        :videoDetailInfo="mvDetailInfo"
+        :videoDetail="mvDetail"
+        :url="url" @likeClick="likeClick">
+      </video-main>
       <!--mv 评论列表-->
-      <comment-list :comments="comments"></comment-list>
+      <comment-list :comments="comments" :_getMvComments="_getMvComments" @commentLikeClick="commentLikeClick"></comment-list>
     </div>
     <div class="right-container">
-      <div class="des">
-        <h2>视频简介</h2>
-        <p v-if="mvDetail.desc">{{mvDetail.desc}}</p>
-        <p v-if="!mvDetail.desc">该mv暂无简介</p>
-      </div>
-      <div class="recommend-video">
-        <h2>相关推荐</h2>
-        <ul>
-          <li v-for="item in recommendMv" :key="item.id">
-            <div class="cover">
-              <img :src="item.cover" alt="">
-              <i class="iconfont iconbofang2" @click="play(item.id)"></i>
-            </div>
-            <h3>
-              <i class="iconfont iconmv"></i>
-              <span>
-                {{item.name}}
-              </span>
-            </h3>
-            <p>By.{{item.artists}}</p>
-          </li>
-        </ul>
-      </div>
+      <video-recommend
+        :videoDetail="mvDetail"
+        :videoRecommend="recommendMv"
+        @play="play">
+      </video-recommend>
     </div>
   </div>
 </template>
 
 <script>
   import CommentList from "../components/common/CommentList";
+  import VideoMain from "../components/common/VideoMain";
+  import VideoRecommend from "../components/common/VideoRecommend";
   export default {
     name: "MvDetail",
     components: {
-      CommentList
+      CommentList,
+      VideoMain,
+      VideoRecommend
     },
     data() {
       return {
@@ -88,6 +45,18 @@
       }
     },
     methods: {
+      // 评论点赞
+      commentLikeClick(id, liked) {
+        let t = liked ? 0 : 1
+        this._commentLike(id, t)
+      },
+      // 资源点赞
+      likeClick(liked) {
+        console.log(liked)
+        let t = liked ? 0 : 1
+        console.log(t)
+        this._resourceLike(t)
+      },
       // 点击播放 推荐 mv
       play(id) {
         this.$router.push(`/mv-detail/${id}`)
@@ -101,6 +70,38 @@
         this._getMvComments()
         // 获取相关推荐 mv (相似 mv)
         this._getRecommendMv()
+      },
+      // 评论点赞
+      async _commentLike(id, t) {
+        let params = {
+          type: 1,
+          id: this.$route.params.id,
+          cid: id,
+          t: t,
+          timeStamp: new Date().valueOf()
+        }
+        let res = await this.$api.commentLike(params)
+        if (res.data.code === 200) {
+          setTimeout(() => {
+            this._getMvComments()
+          }, 20)
+        }
+      },
+      // 资源点赞
+      async _resourceLike(t) {
+        let params = {
+          id: this.$route.params.id,
+          type: 1,
+          t: t,
+          timeStamp: new Date().valueOf()
+        }
+        let res = await this.$api.resourceLike(params)
+        if (res.data.code === 200) {
+          setTimeout(() => {
+            // 获取 mv 点赞转发评论数数据
+            this._getMvDetailInfo()
+          }, 500)
+        }
       },
       // 获取 mv 播放地址
       async _getMvURL() {
@@ -131,9 +132,14 @@
       // 获取 mv 点赞转发评论数数据
       async _getMvDetailInfo() {
         try {
-          let res = await this.$api.getMvDetailInfo(this.$route.params.id)
+          let params = {
+            mvid: this.$route.params.id,
+            timeStamp: new Date().valueOf()
+          }
+          let res = await this.$api.getMvDetailInfo(params)
           if (res.status === 200 && res.statusText === "OK") {
             this.mvDetailInfo = res.data
+            console.log(this.mvDetailInfo)
           }
         } catch (err) {
           console.log(err)
@@ -145,11 +151,13 @@
           let params = {
             id: this.$route.params.id,
             limit: 20,
-            offset: 0
+            offset: 0,
+            timeStamp: new Date().valueOf()
           }
           let res = await this.$api.getMvComments(params)
           if (res.status === 200 && res.statusText === "OK") {
             // 最新评论
+            console.log(res)
             if (res.data.comments.length !== 0) {
               this.comments = res.data.comments
             } else if (res.data.hotComments.length !== 0) {
@@ -173,7 +181,6 @@
               }).join("/")
             })
             this.recommendMv = res.data.mvs
-            console.log(res.data)
           }
         } catch (err) {
           console.log(err)
@@ -208,136 +215,15 @@
     border-radius: 10px;
     min-width: 600px;
     margin-right: 20px;
-    .video-container{
-      width: 100%;
-      padding-bottom: 56.6%;
-      position: relative;
-      background-color: #000;
-      video{
-        position: absolute;
-        width: 100%;
-        height: 100%;
-      }
-    }
-    .icon{
-      i{
-        color: #FA2800;
-        font-size: 20px;
-      }
-      .play-count{
-        float: right;
-        font-size: 12px;
-      }
-    }
-    .tags{
-      margin-top: 10px;
-      .tag{
-        padding: 4px 4px;
-        margin-right: 5px;
-        color: #FA2800;
-        font-size: 12px;
-      }
-    }
-    .publish{
-      margin-top: 10px;
-      color: #4a4a4a;
-      font-size: 14px;
-    }
-    .button{
-      display: flex;
-      margin-top: 10px;
-      .icon-wrapper{
-        padding:  6px 20px;
-        margin-right: 10px;
-        background-color: #f2f2f2;
-        border-radius: 20px;
-        cursor: pointer;
-        i{
-          font-size: 16px;
-          color: #333;
-        }
-      }
-    }
-    .comments{
-      margin-top: 30px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid #c2c2c2;
-    }
+
 
   }
   .right-container{
     flex: 0 0 auto;
     width: 350px;
-    .des,.recommend-video{
-      padding: 10px;
-      box-shadow: 0 5px 40px rgba(2, 10, 18, .1);
-      border-radius: 10px;
-      margin-bottom: 20px;
-      h2{
-        padding-left: 10px;
-        border-left: 3px solid #FA2800;
-        margin-bottom: 10px;
-      }
-    }
-    .des{
-      p{
-        font-size: 14px;
-        color: #4a4a4a;
-        max-height: 300px;
-        overflow: auto;
-      }
-    }
-    .recommend-video{
-      ul{
-        li{
-          margin-top: 25px;
-          .cover{
-            width: 100%;
-            height: 185.45px;
-            position: relative;
-            i{
-              color: #fff;
-              padding: 12px;
-              background-color: red;
-              border-radius: 100%;
-              position: absolute;
-              top: 50%;
-              left: 50%;
-              transform: translate(-50%, -50%);
-              opacity: 0;
-            }
-            &:hover{
-              i{
-                opacity: 1;
-              }
-            }
-          }
-          h3{
-            display: flex;
-            margin: 10px 0 5px;
-            i{
-              color: #FA2800;
-            }
-            span{
-              width: 100%;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-            }
-          }
-          p{
-            font-size: 13px;
-            font-weight: 300;
-            color: #4a4a4a;
-          }
-        }
-      }
-    }
   }
 }
-.icon-active{
-  color: #FA2800;
-}
+
 .clearfix::before{
   content: "";
   display: block;

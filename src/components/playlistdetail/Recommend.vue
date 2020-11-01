@@ -4,7 +4,7 @@
     <ul>
       <li v-for="item in playListRecommend" :key="item.id">
         <div class="avatar">
-          <img :src="item.coverImgUrl+ '?params=50y50'" alt="">
+          <img v-lazy="item.coverImgUrl+ '?params=50y50'" alt="">
         </div>
         <div class="describe">
           <h3>{{item.name}}</h3>

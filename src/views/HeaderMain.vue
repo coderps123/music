@@ -41,7 +41,7 @@
                 {{profile.nickname}}<i class="el-icon-arrow-down el-icon--right"></i>
               </span>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command="profile">
+                <el-dropdown-item command="profile-el">
                   <i class="iconfont iconmine"></i>个人主页
                 </el-dropdown-item>
                 <el-dropdown-item>
@@ -50,7 +50,7 @@
                 <el-dropdown-item>
                   <i class="iconfont iconshezhi"></i>个人设置
                 </el-dropdown-item>
-                <el-dropdown-item>
+                <el-dropdown-item command="sign-out">
                   <i class="iconfont icontuichu"></i>退出登录
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -63,7 +63,7 @@
       <div class="search-container" @click.stop="a">
         <div class="bg">
           <div class="search-form">
-            <input type="text" placeholder="请输入搜索关键字, 并按回车键" @keyup.enter="search($event.target.value)">
+            <input type="text" placeholder="请输入搜索关键字, 并按回车键" @keyup.enter="search($event.target.value.trim())">
           </div>
         </div>
         <div class="histroy-search">
@@ -72,15 +72,15 @@
               <i class="iconfont iconzuji"></i>
               <span>历史搜索</span>
             </div>
-            <div class="right">
+            <div class="right" @click="delectAll">
               清空
             </div>
           </div>
           <div class="content">
             <ul>
-              <li>
-                <span>12212</span>
-                <i class="iconfont iconclear"></i>
+              <li v-for="(item, index) in historySearch" :key="index" @click="historyItemSearch(item)">
+                <span>{{item}}</span>
+                <i class="iconfont iconclear" @click.stop="deleteTag(index)"></i>
               </li>
             </ul>
           </div>
@@ -94,7 +94,7 @@
           </div>
           <div class="content">
             <ul>
-              <li v-for="item in hotSearchList" :key="item.first">
+              <li v-for="item in hotSearchList" :key="item.first" @click="hotSearchClick(item.first)">
                 <span>{{item.first}}</span>
               </li>
             </ul>
@@ -109,24 +109,62 @@
 </template>
 
 <script>
-  import { mapGetters } from "vuex"
+  import { mapGetters, mapMutations } from "vuex"
   export default {
     name: "HeaderMain",
     computed: {
       ...mapGetters([
-        "profile"
+        "profile",
+        "historySearch",
       ])
     },
     data() {
       return {
         isShowSearch: false,
-        hotSearchList: []
+        hotSearchList: [],
       }
     },
+    watch: {
+      historySearch(newHis, oldHis) {
+        window.localStorage.setItem("historySearch", JSON.stringify(newHis))
+      },
+    },
     methods: {
+      // 删除历史搜索项
+      deleteTag(index) {
+        this.deleteHistorySearchItem(index)
+      },
+      // 清空历史记录
+      delectAll() {
+        this.clearHistorySearch()
+      },
+      // 历史搜索
+      historyItemSearch(value) {
+        this.search(value)
+      },
+      // 热门搜索
+      hotSearchClick(value) {
+        this.search(value)
+      },
       handleCommand(command) {
-        if (command === "profile") {
+        if (command === "profile-el") {
           this.$router.push("/profile")
+        } else if (command === "sign-out") {
+          this.$api.logout().then(res => {
+            if (res && res.data.code === 200) {
+              window.localStorage.setItem("profile", JSON.stringify(null))
+              window.localStorage.setItem("token", JSON.stringify(null))
+              window.localStorage.setItem("cookie", JSON.stringify(null))
+              this.setProfile(window.localStorage.getItem('profile'))
+              this.$message.success("退出登录成功")
+              this.$forceUpdate()
+              if (this.$route.path.indexOf('/home') === -1) {
+                this.$router.replace("/")
+              }
+            }
+          }).catch(err => {
+            console.log(err);
+          })
         }
       },
       // 打开搜索框
@@ -152,16 +190,19 @@
       a() {},
       // 跳转到 search 页面
       search(value) {
-        this.$router.push({
-          path: "/search",
-          query: {
-            keywords: value
-          }
-        })
-        this.clearSearch()
+        if (value) {
+          this.$router.push(`/search/${value}/songs`)
+          this.clearSearch()
+          this.setHistorySearch(value)
+        }
       },
-
-    }
+      ...mapMutations([
+        "setHistorySearch",
+        "deleteHistorySearchItem",
+        "clearHistorySearch",
+        "setProfile"
+      ])
+    },
   }
 </script>
 
@@ -314,6 +355,7 @@
               i{
                 padding: 4px 0;
                 margin-left: 6px;
+                font-size: 12px;
               }
               &:hover{
                 color: #161e27;

@@ -28,7 +28,7 @@
 .footer-main{
   width: 100%;
   background-color: #161e27;
-  padding-top: 70px;
+  padding-top: 20px;
   .footer-content{
     border-bottom: 1px solid #797979;
     p:first-child{

@@ -19,7 +19,11 @@
     methods: {
       async _getSingerSingle(id) {
         try {
-          let res = await this.$api.getSingerSingle(id)
+          let params = {
+            id: id,
+            timeStamp: new Date().valueOf()
+          }
+          let res = await this.$api.getSingerSingle(params)
           if (res.status === 200 && res.statusText === "OK") {
             res.data.hotSongs.forEach((item) => {
               let obj = {}

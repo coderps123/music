@@ -1,12 +1,12 @@
 <template>
   <div class="top-title">
     <div class="cover">
-      <img :src="playList.coverImgUrl" alt="">
+      <img v-lazy="playList.coverImgUrl" alt="">
     </div>
     <div class="detail-container">
       <h1>{{playList.name}}</h1>
       <div class="icon-area">
-        <img :src="playList.creator.avatarUrl" alt="">
+        <img v-lazy="playList.creator.avatarUrl" alt="">
         <span class="nick-name">{{playList.creator.nickname}}</span>
         <span class="create-time">{{playList.createTime | formatDate}}</span>
       </div>

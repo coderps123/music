@@ -16,7 +16,7 @@
     </ul>
     <ul class="comments">
       <li v-for="comment in comments">
-        <img class="avatar" :src="comment.user.avatarUrl + '?params=50y50'" alt="">
+        <img class="avatar" v-lazy="comment.user.avatarUrl + '?params=50y50'" alt="">
         <div class="comment-info">
           <h3>
             {{comment.user.nickname}}

@@ -13,16 +13,16 @@
       }
     },
     methods: {
-      // 获取相似歌手
-      async _getSimilarSinger() {
-        let res = await this.$api.getSimilarSinger(this.$route.params.id.trim())
-        console.log(res)
-        console.log(typeof this.$route.params.id.trim())
-      }
+      // // 获取相似歌手
+      // async _getSimilarSinger() {
+      //   let res = await this.$api.getSimilarSinger(this.$route.params.id.trim())
+      //   console.log(res)
+      //   console.log(typeof this.$route.params.id.trim())
+      // }
     },
     created() {
       // 获取相似歌手
-      this._getSimilarSinger()
+      // this._getSimilarSinger()
     }
   }
 </script>

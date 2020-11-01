@@ -16,6 +16,8 @@ const state = {
   currentSongIndex: 0,
   // 播放模式 ("orderPlay", "oneLoop", "randomPlay") // 默认就是 orderPlay
   playMode: "orderPlay",
+  // 历史搜索
+  historySearch: JSON.parse(window.localStorage.getItem("historySearch")) || []
 }
 
 export default state

@@ -4,28 +4,29 @@
     <table class="container">
       <tr class="group" v-for="(item, index) in this.songs" :key="item.id">
         <td class="order-number">
-          <a href="">
-            {{index | handleOrderNumber}}
-            <i class="iconfont"></i>
-          </a>
+          <play-button :playList="songs" :item="item" :index="index"></play-button>
         </td>
         <td class="image">
-          <img :src="item.picUrl" alt="">
+          <img v-lazy="item.picUrl" alt="">
         </td>
         <td class="singers">
-          <h3>{{item.name}}</h3>
+          <h3>{{item.song}}</h3>
           <span>{{item.singers}}</span>
         </td>
         <td class="album-name">{{item.albumName}}</td>
-        <div class="transition">{{item.transition | formatTransitionTime}}</div>
+        <div class="transition">{{item.transitionTime | formatTransitionTime}}</div>
       </tr>
     </table>
   </div>
 </template>
 
 <script>
+  import PlayButton from "../common/PlayButton";
   export default {
     name: "RecommendSongs",
+    components: {
+      PlayButton
+    },
     data() {
       return {
         songs: []
@@ -63,11 +64,11 @@
             res.data.result.forEach(item => {
               let songObj = {}
               songObj.id = item.id
-              songObj.name = item.name
+              songObj.song = item.name
               songObj.picUrl = item.picUrl
               songObj.singers = item.song.album.artists.map(item => item.name).join("/")
               songObj.albumName = "《" + item.song.album.name + "》"
-              songObj.transition = item.song.duration
+              songObj.transitionTime = item.song.duration
               this.songs.push(songObj)
             })
           }

@@ -1,4 +1,7 @@
 
+// 登录状态
+export const loginStatus = state => state.loginStatus
+
 // 用户的个人信息
 export const profile = state => state.profile
 
@@ -19,3 +22,6 @@ export const playRecord = state => state.playRecord
 
 // 播放模式
 export const playMode = state => state.playMode
+
+// 历史搜索
+export const historySearch = state => state.historySearch

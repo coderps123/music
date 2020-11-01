@@ -1,67 +1,45 @@
 <template>
   <div class="song-sheet">
-    <!--标签栏-->
-    <div class="category-container">
-      <div class="main-click" @click="showMask">
-        <span class='main-tag'>
-          {{mainTag}}
-        </span>
-        <i class="iconfont iconjiantouyou" v-show="!isShowMask"></i>
-        <i class="iconfont iconjiantouxia" v-show="isShowMask"></i>
-      </div>
-      <div class="hot-tags">热门标签:</div>
-      <ul>
-        <li v-for="(tag, index) in hotTags" :key="tag.id" :class="{'link-active': (index == currentIndex)}">
-          <a href="#" :data-index="index" @click="switchHotTags($event.target.dataset.index, tag.name)">{{tag.name}}</a>
-        </li>
-      </ul>
-      <div class="hot">
-        <span @click="chooseType('hot')" :class="{'hot-active': songSheetParams.order === 'hot'}" >热门</span>
-        <span @click="chooseType('new')" :class="{'hot-active': songSheetParams.order === 'new'}" >最新</span>
-      </div>
+    <div v-if="!isLoading">
+      <!--标签栏-->
+      <tag-bar
+        :mainTag="mainTag"
+        :songSheetParams="songSheetParams"
+        :hotTags="hotTags"
+        :categoryType="categoryType"
+        :videoPage="true"
+        @switchHotTags="switchHotTags"
+        @chooseType="chooseType"
+        @transitionClick="transitionClick">
+      </tag-bar>
+      <song-sheet-list :songSheetList="songSheetList"></song-sheet-list>
+      <!--分页区域-->
+      <el-pagination
+        :page-size="songSheetParams.limit"
+        layout="total, prev, pager, next"
+        @current-change="currentChange"
+        :total="total">
+      </el-pagination>
     </div>
-    <!--弹窗区域-->
-    <transition name="fade">
-      <div class="mask" v-show="isShowMask" @click="showMask">
-        <div class="group" v-for="group in categoryType" :key="group.key">
-          <h2>
-            <a href="javascript:;">
-              <i :class="group.icon"></i>
-              <span>{{group.value}}</span>
-            </a>
-          </h2>
-          <ul class="clearfix">
-            <li v-for="tag in group.tags" @click="transitionClick(tag.name)">
-              <a href="#">{{tag.name}}</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </transition>
-    <song-sheet-list :songSheetList="songSheetList"></song-sheet-list>
-    <!--分页区域-->
-    <el-pagination
-      :page-size="songSheetParams.limit"
-      layout="total, prev, pager, next"
-      @current-change="currentChange"
-      :total="total">
-    </el-pagination>
+    <loading v-if="isLoading"></loading>
   </div>
 </template>
 
 <script>
   import SongSheetList from "../components/common/SongSheetList"
+  import TagBar from "../components/common/TagBar";
+  import Loading from "../components/common/Loading"
   export default {
     name: "SongSheet",
     components: {
-      SongSheetList
+      SongSheetList,
+      TagBar,
+      Loading
     },
     data() {
       return {
         mainTag: "全部",
-        isShowMask: false,
         hotTags: [],
-        currentIndex: -1, // 默认那个标签都不选择
         categoryType: [
           {
             key: 0,
@@ -101,7 +79,8 @@
           offset: 0
         },
         songSheetList: [],
-        total: 0
+        total: 0,
+        isLoading: true
       }
     },
     methods: {
@@ -126,13 +105,8 @@
         // 请求数据
         this._getSongSheet()
       },
-      showMask() {
-        this.isShowMask = !this.isShowMask
-      },
-      // 切换热门标签
-      switchHotTags(index, tagName) {
-        this.currentIndex = index
-        this.songSheetParams.cat = tagName
+      switchHotTags(tag) {
+        this.songSheetParams.cat = tag.name
         // 请求数据
         this._getSongSheet()
       },
@@ -176,6 +150,7 @@
           if (res.status === 200 && res.statusText === "OK") {
             this.songSheetList = res.data.playlists
             this.total = res.data.total
+            this.isLoading = false
           }
         } catch (err) {
           console.log(err)
@@ -204,96 +179,8 @@
   padding-top: 85px;
   padding-bottom: 30px;
   position: relative;
-  .category-container{
-    display: flex;
-    background-color: #fff;
-    box-shadow: 0 5px 40px rgba(2, 10, 18, 0.1);
-    margin: 0 20px 20px;
-    .main-click{
-      padding: 11px 15px;
-      background-color: #FA2800;
-      border-radius: 5px 0 0 5px;
-      color: #fff;
-      cursor: pointer;
-      i{
-        margin-left: 10px;
-      }
-    }
-    .hot-tags{
-      padding: 0 15px;
-      display: flex;
-      align-items: center;
-    }
-    ul{
-      flex: 1;
-      li{
-        float: left;
-        margin-right: 20px;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        a:hover{
-          color: #FA2800;
-        }
-      }
-    }
-    .hot{
-      display: flex;
-      align-items: center;
-      span{
-        padding: 6px 10px;
-        background-color: #F7F7F7;
-        margin-right: 20px;
-        border-radius: 4px;
-        font-size: 12px;
-        color: #000;
-        cursor: pointer;
-      }
-      .hot-active{
-        background-color: #FA2800;
-        color: #fff;
-      }
-    }
-  }
-  .mask{
-    width: 720px;
-    height: 370px;
-    margin: -12px 0 0 15px;
-    background-color: #fff;
-    box-shadow: 0 5px 40px rgba(2, 10, 18, .1);
-    border-radius: 4px;
-    position: absolute;
-    z-index: 10;
-    overflow: auto;
-    padding-bottom: 40px;
-    .group{
-      h2{
-        padding: 26px 0 8px 20px;
-        i{
-          margin-right: 6px;
-        }
-      }
-      ul{
-        padding: 0 10px;
-        display: flex;
-        flex-wrap: wrap;
-        li{
-          padding: 8px 15px;
-          border-radius: 50px;
-          margin: 8px 0 0 10px;
-          color: #161e27;
-          font-size: 12px;
-          background-color: #F7F7F7;
-        }
-        li:hover{
-          background-color: #FA2800;
-          a{
-            color: #fff;
-          }
-        }
-      }
-    }
-  }
+
+
   .el-pagination{
     margin-top: 20px;
     text-align: center;
@@ -318,20 +205,11 @@
     color: #FA2800;
   }
 }
-.link-active a{
-  color: #FA2800;
-}
+
 .clearfix::after{
   content: "";
   display: block;
   clear: both;
 }
-.fade-enter-active, .fade-leave-active {
-  transition: all .3s ease;
 
-}
-.fade-enter, .fade-leave-to {
-  opacity: 0;
-  transform: translate(0, 30px);
-}
 </style>

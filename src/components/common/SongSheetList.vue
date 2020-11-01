@@ -7,7 +7,7 @@
             <i class="iconfont iconbofang"></i>
             {{item.playCount | handlePlayCount}}
           </span>
-          <img :src="item.picUrl || item.coverImgUrl" alt="">
+          <img v-lazy="item.picUrl || item.coverImgUrl" alt="">
           <h3>{{item.name}}</h3>
         </a>
       </div>

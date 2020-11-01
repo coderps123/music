@@ -2,7 +2,7 @@
   <div class="play-bar">
     <div class="centent">
       <div class="avatar">
-        <img :src="currentSong.picUrl" alt="">
+        <img v-lazy="currentSong.picUrl" alt="">
       </div>
       <div class="info">
         <h2>{{currentSong.song}}</h2>
@@ -392,11 +392,6 @@
             })
           }
         } else {
-          if (this.$refs.lyricList) {
-            this.$nextTick(() => {
-              // this.$refs.lyricList.scrollTo(0, 0, 1000)// 滚动到顶部
-            })
-          }
         }
       },
       ...mapMutations([

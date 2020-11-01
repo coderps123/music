@@ -2,7 +2,7 @@
   <div class="banner">
     <swiper :options="swiperOption" v-if="bannersInit">　　　　
       <swiper-slide v-for="banner in banners" :key="banner.imageUrl">
-        <img :src="banner.imageUrl"/>
+        <img v-lazy="banner.imageUrl"/>
       </swiper-slide>
       <div class="swiper-pagination" slot="pagination"></div>
     </swiper>
@@ -60,6 +60,7 @@
     .swiper-wrapper{
       .swiper-slide{
         img{
+          height: 136.5px;
           border-radius: 3px;
         }
       }

@@ -1,9 +1,12 @@
 <template>
   <div class="home">
-    <banner></banner>
-    <recommend-song-sheet></recommend-song-sheet>
-    <recommend-song></recommend-song>
-    <recommend-singer></recommend-singer>
+    <div v-if="!isLoading">
+      <banner></banner>
+      <recommend-song-sheet :songSheetList="songSheetList"></recommend-song-sheet>
+      <recommend-song></recommend-song>
+      <recommend-singer></recommend-singer>
+    </div>
+    <loading v-if="isLoading"></loading>
   </div>
 </template>
 
@@ -12,6 +15,8 @@
   import RecommendSongSheet from "../components/home/RecommendSongSheet";
   import RecommendSong from "../components/home/RecommendSongs"
   import RecommendSinger from "../components/home/RecommendSinger";
+  import Loading from "../components/common/Loading"
+
   export default {
     name: "Home",
     components: {
@@ -19,13 +24,33 @@
       RecommendSongSheet,
       RecommendSong,
       RecommendSinger,
+      Loading
     },
     data() {
       return {
         pageY: 600,
-        isShowGoTop: false
+        isShowGoTop: false,
+        isLoading: true,
+        limit: 24, // 推荐歌单 获取数量
+        songSheetList: []
       }
     },
+    created() {
+      this._getRecommendSongSheet()
+    },
+    methods: {
+      async _getRecommendSongSheet() {
+        try {
+          let res = await this.$api.getRecommendSongeSheet(this.limit)
+          if (res.status === 200 && res.statusText === "OK") {
+            this.songSheetList = res.data.result
+            this.isLoading = false
+          }
+        } catch (error) {
+          console.log(error)
+        }
+      }
+    }
   }
 </script>
 

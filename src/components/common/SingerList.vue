@@ -2,9 +2,9 @@
   <div class="wrapper">
     <div class="group" v-for="item in this.singers" :key="item.id" @click="singerDetail(item.id)">
       <a href="javascript:;">
-        <img :src="item.picUrl" alt="">
+        <img v-lazy="item.picUrl" alt="">
         <h3>{{item.name}}</h3>
-        <span>单曲数{{item.musicSize}}</span>
+        <span v-if="isShowSongCount">单曲数{{item.musicSize}}</span>
       </a>
     </div>
   </div>
@@ -19,6 +19,10 @@
         default() {
           return []
         }
+      },
+      isShowSongCount: {
+        type: Boolean,
+        default: true
       }
     },
     methods: {
@@ -33,7 +37,7 @@
   .wrapper{
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: flex-start;
     .group{
       flex: 0 0 10%;
       padding: 10px;

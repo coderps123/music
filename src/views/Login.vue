@@ -15,7 +15,7 @@
         <el-form-item prop="password">
           <div class="item">
             <i class="iconfont iconmima"></i>
-            <el-input v-model="formData.password" placeholder="请输入密码"></el-input>
+            <el-input v-model="formData.password" placeholder="请输入密码" type="password"></el-input>
           </div>
         </el-form-item>
         <el-form-item class="login-botton">
@@ -30,7 +30,7 @@
 </template>
 
 <script>
-  import {mapMutations} from "vuex"
+  import {mapMutations, mapGetters} from "vuex"
   export default {
     name: "Login",
     components: {
@@ -62,13 +62,17 @@
             return this.$message.error("表单验证错误")
           }
           try {
-            this.$api.login(this.formData).then(res => {
+            let params = {
+              ...this.formData,
+              timeStamp: new Date().valueOf()
+            }
+            this.$api.login(params).then(res => {
               if (res.status === 200 && res.statusText === "OK") {
-                if (res.data.code === 200) {
-                  console.log(res)
+                if (res && res.data.code === 200) {
                   window.localStorage.setItem('cookie', res.data.cookie)
                   window.localStorage.setItem("token", res.data.token)
                   window.localStorage.setItem("profile", JSON.stringify(res.data.profile))
+                  this.setProfile(window.localStorage.getItem("profile"))
                   this.$message.success("登陆成功")
                   this.$router.replace("/")
                 }
@@ -103,6 +107,7 @@
     bottom: 0;
     left: 0;
     right: 0;
+    z-index: 1001;
     overflow: hidden; // 解决高度塌陷问题
     .login-box {
       width: 350px;

@@ -22,19 +22,30 @@
       HeaderMain,
       FooterMain,
       GoTop,
-      PlayBar
+      PlayBar,
+    },
+    data() {
+      return {
+      }
     },
     computed: {
       ...mapGetters([
-        "currentSong"
+        "currentSong",
       ])
     },
   }
 </script>
 
 <style scoped lang="less">
-  .router-page{
-    padding-left: 5%;
-    padding-right: 5%;
+  .main-router-pages{
+    position: relative;
+    min-height: 100vh;
+    min-width: 1200px;
+    .router-page{
+      padding-left: 5%;
+      padding-right: 5%;
+      min-height: 473px;
+    }
   }
+
 </style>

@@ -3,7 +3,7 @@
     <h2>喜欢这个歌单的人</h2>
     <ul>
       <li v-for="item in subscribers">
-        <img :src="item.avatarUrl + '?params=50y50'" alt="">
+        <img v-lazy="item.avatarUrl + '?params=50y50'" alt="">
       </li>
     </ul>
   </div>

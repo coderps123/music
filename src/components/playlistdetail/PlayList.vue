@@ -12,35 +12,35 @@
     </div>
     <table class="play-list">
       <thead>
-        <tr>
-          <th class="index-th">序号</th>
-          <th class="song-th">歌曲</th>
-          <th class="singer-th">歌手</th>
-          <th class="album-th">专辑</th>
-          <th class="transition-th">时长</th>
-        </tr>
+      <tr>
+        <th class="index-th">序号</th>
+        <th class="song-th">歌曲</th>
+        <th class="singer-th">歌手</th>
+        <th class="album-th">专辑</th>
+        <th class="transition-th">时长</th>
+      </tr>
       </thead>
       <tbody>
-        <tr v-for="(item, index) in playListTable" :key="item.id">
-          <td>
-            <play-button :item="item" :index="index" :playList="playListTable"></play-button>
-          </td>
-          <td>
-            <div class="avatar">
-              <div class="cover">
-                <img :src="item.picUrl" alt="">
-              </div>
-              <p>{{item.song}}</p>
+      <tr v-for="(item, index) in playListTable" :key="item.id">
+        <td>
+          <play-button :item="item" :index="index" :playList="playListTable"></play-button>
+        </td>
+        <td>
+          <div class="avatar">
+            <div class="cover">
+              <img v-if="item.picUrl" v-lazy="item.picUrl" alt="">
             </div>
-          </td>
-          <td>
-            <p>{{item.singer}}</p>
-          </td>
-          <td>
-            <p>{{item.album}}</p>
-          </td>
-          <td>{{item.transitionTime | formatPlayTime}}</td>
-        </tr>
+            <p>{{item.song}}</p>
+          </div>
+        </td>
+        <td>
+          <p>{{item.singer}}</p>
+        </td>
+        <td>
+          <p>{{item.album}}</p>
+        </td>
+        <td>{{item.transitionTime | formatPlayTime}}</td>
+      </tr>
       </tbody>
     </table>
   </div>
@@ -69,12 +69,13 @@
       }
     },
     components: {
-      PlayButton
+      PlayButton,
     },
     data() {
       return {
         currentIndex: -1,
         iIsShow: true,
+        isLoading: true
       }
     },
     computed: {
@@ -92,6 +93,12 @@
     methods: {
       // 设置是否收藏歌单
       async _setPlayListCollection() {
+        // 先判断你是否登录
+        let loginStatus = await this.$api.getLoginStatus()
+        if (!loginStatus) {
+          this.$message.info("请先登录")
+          return this.$router.push("/login")
+        }
         let t = this.subscribed ? 2 : 1
         let params = {
           t: t,
