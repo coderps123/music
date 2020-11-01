@@ -1,19 +1,26 @@
 # music
 
-## Project setup
+# 下载须知:
+本项目api的是 Binaryify 后端api 地址: https://github.com/Binaryify/NeteaseCloudMusicApi 
+
+## 下载使用 
 ```
-npm install
+git clone https://github.com/Binaryify/NeteaseCloudMusicApi
+```
+## 开启后端服务
+```$xslt
+node app.js
 ```
 
-### Compiles and hot-reloads for development
+## 下载本项目
+```$xslt
+git clone https://github.com/coderps123/music.git
 ```
+## 运行
+```$xslt
+npm install
 npm run serve
 ```
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### 特别感谢
+Binaryify lxhcool
